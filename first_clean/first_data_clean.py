@@ -81,25 +81,6 @@ def carrier(data1, data2):
 	process(data2)
 
 
-def city(data1, data2):
-	global json_dict
-
-	def process(data):
-		new_city = []
-		for i in data["city"]:
-			try:
-				new_city.append(city_set.index(i))
-			except:
-				new_city.append(len(city_set))
-		data["city"] = new_city
-
-	city_set = list(set(data1["city"]) | set(data2["city"]))
-	json_dict["city"] = city_set
-
-	process(data1)
-	process(data2)
-
-
 def lan(data1, data2):
 	global json_dict
 
@@ -161,66 +142,44 @@ def model(data):
 	data["model"] = new_model
 
 
-def osv(data1, data2):
-	global json_dict
+def osv(data):
+	new_osv = []
+	for i in data["osv"]:
+		try:
+			if "," in i:
+				i = i.replace(",", ".")
+			if " 十核2.0G_HD" in i:
+				i = i.replace(" 十核2.0G_HD", "")
 
-	def process_1(data):
-		new_osv = []
-		for i in data["osv"]:
-			try:
-				if "," in i:
-					i = i.replace(",", ".")
-				if " 十核2.0G_HD" in i:
-					i = i.replace(" 十核2.0G_HD", "")
-
-				process = i.split(".")
-				while process[-1] == "0":
-					del process[-1]
-				i = ".".join(process)
-			except:
-				pass
-			finally:
-				new_osv.append(i)
-		
-		return new_osv
-
-	def process_2(data, new_osv):
-		for n, i in enumerate(new_osv):
-			try:
-				new_osv[n] = osv_set.index(i)
-			except:
-				new_osv[n] = len(osv_set)
-		data["osv"] = new_osv
-
-	new_osv_1 = process_1(data1)
-	new_osv_2 = process_1(data2)
-
-	osv_set = list(set(new_osv_1) | set(new_osv_2))
-	json_dict["osv"] = osv_set
-
-	process_2(data1, new_osv_1)
-	process_2(data2, new_osv_2)
+			process = i.split(".")
+			while process[-1] == "0":
+				del process[-1]
+			i = ".".join(process)
+		except:
+			pass
+		finally:
+			new_osv.append(i)
+	
+	data["osv"] = new_osv
 
 
 # 将连续值，需要one-hot的特征，需要embedding的特征分开排放
 def change_col_index(data):
 	col_index = ["label", "nginxtime", "ip", "resolution_ratio", "apptype", \
-				"city" ,"dvctype", "ntt", "carrier", "osv", "orientation", \
-				"lan", "pkgname",  "adunitshowid", "mediashowid", "reqrealip",\
-				 "adidmd5", "imeimd5","openudidmd5", "macmd5", "model"]
+				"dvctype", "ntt", "carrier", "orientation", "lan", "pkgname", \
+				"adunitshowid", "mediashowid", "city", "reqrealip", "adidmd5", \
+				"imeimd5","openudidmd5", "macmd5", "model", "osv"]
 	if data is data2:
 		del col_index[0]
 
-	data = data[col_index]
+	return data[col_index]
 
 
 # 第一轮清洗
 def first_data_clean(data1, data2):
 	apptype(data1, data2)
 	carrier(data1, data2)
-	city(data1, data2)
 	lan(data1, data2)
-	osv(data1, data2)
 
 	for i in [data1, data2]:
 		del_features(i)
@@ -229,7 +188,7 @@ def first_data_clean(data1, data2):
 		orientation(i)
 		h_w_ppi(i)
 		model(i)
-		change_col_index(i)
+		osv(i)
 
 
 # one-hot_json.json中存储所有需要one-hot特征的索引，不要轻易改动
@@ -245,6 +204,8 @@ if __name__ == "__main__":
 	json_dict = {}
 
 	first_data_clean(data1, data2)
+	data1 = change_col_index(data1)
+	data2 = change_col_index(data2)
 
 	data1.to_csv(data1_to_csv_path, index=False)
 	data2.to_csv(data2_to_csv_path, index=False)
