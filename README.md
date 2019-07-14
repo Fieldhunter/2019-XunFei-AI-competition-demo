@@ -25,7 +25,7 @@ orientation：数值中有四个值，０、１、２、90，而特征说明中�
 
 h,w,ppi：三个特征相乘形成新特征－－－像素值（resolution_ratio）。而这三个特征中很多值都为０。为了避免相乘会得到０，对三列都加上0.1后再相乘。
 
-apptype，carrier, city：算出训练集和预测集的种类集合的交集，再把这个交集写入one-hot的json文件中。根据这个交集，为特征值进行索引标记，不在索引内的，
+apptype，carrier：算出训练集和预测集的种类集合的交集，再把这个交集写入one-hot的json文件中。根据这个交集，为特征值进行索引标记，不在索引内的，
 就标记为交集总长加１。
 
 lan：将训练集和预测集中所有值去掉"_"和"-"，并转换为小写形式。之后取交集等步骤同上。
@@ -33,8 +33,8 @@ lan：将训练集和预测集中所有值去掉"_"和"-"，并转换为小写�
 model：将训练集和预测集中所有值去掉" "、"_"、 ","、 "+"、 "/"、 "-"、 "%"、 "("、 ")"、 "."，并转换为小写形式。同时，会出现"huaweihuawei"和"xiaomixiaomi"
 这样的重复，也对其进行了更改。因为此特征需要进行embedding，所以建立索引放在之后做。
 
-osv：将训练集和预测集中所有值去掉尾部的".0"，因为数据中有许多类似6.0与6.0.0的版本号，应该是相同的。有一小部分数据有 " 十核2.0G_HD"的硬件信息和","，也处理掉。
-之后取交集等步骤同lan。
+osv：将训练集和预测集中所有值去掉尾部的".0"，因为数据中有许多类似6.0与6.0.0的版本号，应该是相同的。有一小部分数据有 " 十核2.0G_HD"的硬件信息和","，也处理掉。因为此特征需要进行embedding，所以建立索引放在之后做。
+
 
 #### 最后将数据的排列做个整理，列从左往右:
 
@@ -42,6 +42,6 @@ label：标签
 
 nginxtime，ip，resolution_ratio：连续值特征
 
-apptype，city，dvctype，ntt，carrier，osv，orientation，lan：one-hot特征
+apptype，dvctype，ntt，carrier，orientation，lan：one-hot特征
 
-pkgname，adunitshowid，mediashowid，reqrealip，adidmd5，imeimd5，openudidmd5，macmd5，model：embedding特征
+pkgname，adunitshowid，mediashowid，city，reqrealip，adidmd5，imeimd5，openudidmd5，macmd5，model,　osv：embedding特征
