@@ -1,18 +1,65 @@
 import pandas as pd
 import json
+from datetime import timedelta, datetime
 
 
 # 删除部分字段
 def del_features(data):
-	del_list = ["sid", "ver", "province", "idfamd5", "make", "os"]
+	del_list = ["sid", "ver", "province", "idfamd5", "make", "os", "reqrealip"]
 	for i in del_list:
 		del data[i]
 
+	print("del ok")
 
-# 将nginxtime转换为相对时间，再转化为秒
+
+# 将nginxtime换算成分钟，并放在新特征time
 def nginxtime(data):
-	new_nginxtime = (data["nginxtime"]-data["nginxtime"].min())/1000
-	data["nginxtime"] = new_nginxtime
+	data['datetime'] = pd.to_datetime(data['nginxtime'] / 1000, unit='s') + \
+					   timedelta(hours=8)
+	data['hour'] = data['datetime'].dt.hour
+	data['day'] = data['datetime'].dt.day - data['datetime'].dt.day.min()
+	data['minute'] = data['datetime'].dt.minute.astype('uint8')
+	data["time"] = data['day'] * 24 * 60 + data['hour'] * 60 + data['minute']
+
+	for i in ["datetime", "hour", "day", "minute"]:
+		del data[i]
+
+	print("nginxtime ok")
+
+
+# 形成新字段像素值，resolution_ratio
+def h_w_ppi(data):
+	new_h = data["h"] + 0.1
+	new_w = data["w"] + 0.1
+	new_ppi = data["ppi"] + 0.1
+	resolution_ratio = new_h * new_w * new_ppi
+
+	del data["h"]
+	del data["w"]
+	del data["ppi"]
+
+	data["resolution_ratio"] = resolution_ratio
+	print("h_w_ppi ok")
+
+
+# 将ip地址与城市名称相比较，如果相符则为0,不相符则为1
+def ip(data):
+	# 从网上爬取的ip对应城市的json文件导入
+	with open("data/ip_index.json", "r") as f:
+		ip_index = json.load(f)
+
+	new_ip = []
+	for n, i in enumerate(data["ip"]):
+		try:
+			if ip_index[i] in data["city"][n]:
+				new_ip.append(0)
+			else:
+				new_ip.append(1)
+		except:
+			new_ip.append(1)
+
+	data["ip"] = new_ip
+	print("ip ok")
 
 
 def dvctype(data):
@@ -21,7 +68,9 @@ def dvctype(data):
 		if i == 3:
 			i = 1
 		new_dvctype.append(i)
+
 	data["dvctype"] = new_dvctype
+	print("dvctype ok")
 
 
 def orientation(data):
@@ -30,20 +79,9 @@ def orientation(data):
 		if i == 90:
 			i = 2
 		new_orientation.append(i)
+
 	data["orientation"] = new_orientation
-
-
-# 形成新字段像素值，resolution_ratio
-def h_w_ppi(data):
-	new_h = data["h"]+0.1
-	new_w = data["w"]+0.1
-	new_ppi = data["ppi"]+0.1
-	resolution_ratio = new_h * new_w * new_ppi
-
-	del data["h"]
-	del data["w"]
-	del data["ppi"]
-	data["resolution_ratio"] = resolution_ratio
+	print("orientation ok")
 
 
 def apptype(data1, data2):
@@ -58,11 +96,12 @@ def apptype(data1, data2):
 				new_apptype.append(len(apptype_set))
 		data["apptype"] = new_apptype
 
-	apptype_set = list(set(data1["apptype"]) | set(data2["apptype"]))
+	apptype_set = list(set(data1["apptype"]) & set(data2["apptype"]))
 	json_dict["apptype"] = apptype_set
 
 	process(data1)
 	process(data2)
+	print("apptype ok")
 
 
 def carrier(data1, data2):
@@ -74,11 +113,12 @@ def carrier(data1, data2):
 			new_carrier.append(carrier_set.index(i))
 		data["carrier"] = new_carrier
 
-	carrier_set = list(set(data1["carrier"]) | set(data2["carrier"]))
+	carrier_set = list(set(data1["carrier"]) & set(data2["carrier"]))
 	json_dict["carrier"] = carrier_set
 
 	process(data1)
 	process(data2)
+	print("carrier ok")
 
 
 def lan(data1, data2):
@@ -113,16 +153,28 @@ def lan(data1, data2):
 	new_lan_1 = process_1(data1)
 	new_lan_2 = process_1(data2)
 
-	lan_set = list(set(new_lan_1) | set(new_lan_2))
+	lan_set = list(set(new_lan_1) & set(new_lan_2))
 	json_dict["lan"] = lan_set
 
 	process_2(data1, new_lan_1)
 	process_2(data2, new_lan_2)
+	print("lan ok")
 
 
+# 对model进行初步处理
 def model(data):
 	model_del_string = [" ", "_", ",", "+", "/", "-", "%", "(", ")", "."]
+	special_type = {'PACM00': "OPPO R15", 'PBAM00': "OPPO A5", \
+					'PBEM00': "OPPO R17", 'PADM00': "OPPO A3", \
+					'PBBM00': "OPPO A7", 'PAAM00': "OPPO R15_1", \
+					'PACT00': "OPPO R15_2", 'PABT00': "OPPO A5_1", \
+					'PBCM10': "OPPO R15x"}
 	new_model = []
+
+	# 把一些定制手机的型号转换成一般形式
+	for i in special_type:
+		data['model'].replace(i, special_type[i], inplace=True)
+
 	for i in data["model"]:
 		try:
 			for j in i:
@@ -140,8 +192,10 @@ def model(data):
 			new_model.append(i)
 
 	data["model"] = new_model
+	print("model ok")
 
 
+# 对osv进行初步处理
 def osv(data):
 	new_osv = []
 	for i in data["osv"]:
@@ -159,15 +213,16 @@ def osv(data):
 			pass
 		finally:
 			new_osv.append(i)
-	
+
 	data["osv"] = new_osv
+	print("osv ok")
 
 
-# 将连续值，需要one-hot的特征，需要embedding的特征分开排放
+# 将连续值特征，需要one-hot的特征，需要embedding的特征分开排放
 def change_col_index(data):
-	col_index = ["label", "nginxtime", "ip", "resolution_ratio", "apptype", \
+	col_index = ["label", "time", "ip", "resolution_ratio", "apptype", \
 				"dvctype", "ntt", "carrier", "orientation", "lan", "pkgname", \
-				"adunitshowid", "mediashowid", "city", "reqrealip", "adidmd5", \
+				"adunitshowid", "mediashowid", "city", "adidmd5", \
 				"imeimd5","openudidmd5", "macmd5", "model", "osv"]
 	if data is data2:
 		del col_index[0]
@@ -175,8 +230,8 @@ def change_col_index(data):
 	return data[col_index]
 
 
-# 第一轮清洗
-def first_data_clean(data1, data2):
+# 数据清洗
+def data_clean(data1, data2):
 	apptype(data1, data2)
 	carrier(data1, data2)
 	lan(data1, data2)
@@ -187,23 +242,24 @@ def first_data_clean(data1, data2):
 		dvctype(i)
 		orientation(i)
 		h_w_ppi(i)
+		ip(i)
 		model(i)
 		osv(i)
 
 
-# one-hot_json.json中存储所有需要one-hot特征的索引，不要轻易改动
+# index_json.json中存储所有需要one-hot及embedding特征的索引，不要轻易改动
 if __name__ == "__main__":
-	data1_path = "~/桌面/移动广告/data/train.csv"
-	data2_path = "~/桌面/移动广告/data/test.csv"
-	data1_to_csv_path = "~/桌面/移动广告/data/first_train_clean.csv"
-	data2_to_csv_path = "~/桌面/移动广告/data/first_test_clean.csv"
-	json_path = "one-hot_json.json"
+	data1_path = "data/train.csv"
+	data2_path = "data/test.csv"
+	data1_to_csv_path = "data/train_clean.csv"
+	data2_to_csv_path = "data/test_clean.csv"
+	json_path = "data/index_json.json"
 
 	data1 = pd.read_csv(data1_path)
 	data2 = pd.read_csv(data2_path)
 	json_dict = {}
 
-	first_data_clean(data1, data2)
+	data_clean(data1, data2)
 	data1 = change_col_index(data1)
 	data2 = change_col_index(data2)
 
