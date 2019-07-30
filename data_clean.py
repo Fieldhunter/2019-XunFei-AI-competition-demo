@@ -218,6 +218,39 @@ def osv(data):
 	print("osv ok")
 
 
+# embedding特征构建索引
+def embedding(data1, data2):
+	global json_dict
+
+	def build_index(n, data, feature):
+		new_feature = []
+		for i in data[feature]:
+			try:
+				new_feature.append(embedding_set.index(i))
+			except:
+				new_feature.append(len(embedding_set) + n)
+
+		return new_feature
+
+	embedding_index = ["pkgname", "adunitshowid", "mediashowid", "city", \
+					   "adidmd5", "imeimd5","openudidmd5", "macmd5", \
+					   "model", "osv"]
+	embedding_set = []
+
+	for i in embedding_index:
+		embedding_set += list(set(data1[i]) & set(data2[i]))
+
+	embedding_set = list(set(embedding_set))
+	json_dict["embedding"] = embedding_set
+
+	for n, i in enumerate(embedding_index):
+		data1[i] = build_index(n, data1, i)
+		data2[i] = build_index(n, data2, i)
+		print("{} is ok".format(i))
+
+	print("embedding ok")
+
+
 # 将连续值特征，需要one-hot的特征，需要embedding的特征分开排放
 def change_col_index(data):
 	col_index = ["label", "time", "ip", "resolution_ratio", "apptype", \
@@ -245,6 +278,8 @@ def data_clean(data1, data2):
 		ip(i)
 		model(i)
 		osv(i)
+
+	embedding(data1, data2)
 
 
 # index_json.json中存储所有需要one-hot及embedding特征的索引，不要轻易改动
