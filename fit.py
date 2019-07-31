@@ -12,8 +12,7 @@ OPT = 'adam'
 LOSS = 'binary_crossentropy'
 dropout_ALPHA = 0.5
 BATCH_SIZE = 2048
-EPOCHS = 500
-IMAGE_SIZE = (150,150)
+EPOCHS = 450
 
 # 参数
 DATA_PATH = "data/"

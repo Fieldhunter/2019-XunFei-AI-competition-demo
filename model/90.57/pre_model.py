@@ -4,6 +4,16 @@ from keras.models import Model
 from keras import backend as K
 
 
+"""
+	超参数:
+		OPT = 'adam'
+		LOSS = 'binary_crossentropy'
+		dropout_ALPHA = 0.5
+		BATCH_SIZE = 2048
+		EPOCHS = 450
+"""
+
+
 def model(LOSS, OPT, dropout_ALPHA):
 	# 计算f1指标
 	def f1(y_true, y_pred):
