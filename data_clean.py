@@ -6,6 +6,9 @@ from datetime import timedelta, datetime
 # 删除部分字段
 def del_features(data):
 	del_list = ["sid", "ver", "province", "idfamd5", "make", "os", "reqrealip"]
+	if data is data2:
+		del del_list[0]
+
 	for i in del_list:
 		del data[i]
 

@@ -58,7 +58,12 @@ def embedding_features(data):
 
 # 数据处理
 def data_process(train=True):
-	data = pd.read_csv("data/train_clean.csv")
+	if train == True:
+		data = pd.read_csv("data/train_clean.csv")
+	else:
+		data = pd.read_csv("data/test_clean.csv")
+		sid = pd.read_csv("data/test.csv")
+		sid = list(sid["sid"])
 
 	continuous_train = continuous_features(data)
 	one_hot_train = one_hot_features(data)
@@ -73,4 +78,7 @@ def data_process(train=True):
 			   embedding_train, \
 			   np.array(data["label"]).reshape(len(data["label"]), 1)
 	else:
-		return unembedding_train, embedding_train
+		return unembedding_train, \
+			   embedding_train, \
+			   sid
+
