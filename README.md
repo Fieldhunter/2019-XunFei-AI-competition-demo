@@ -65,3 +65,11 @@ time，ip，resolution_ratio：连续值特征
 apptype，dvctype，ntt，carrier，orientation，lan：one-hot特征
 
 pkgname，adunitshowid，mediashowid，city，adidmd5，imeimd5，openudidmd5，macmd5，model,　osv：embedding特征
+
+## 模型搭建
+
+基本采用unembedding数据输入到一个隐藏层，同时将embedding数据输入到embedding层。之后将两者相连，再输入到一系列的隐藏层去预测。中间使用dropout
+层防止过拟合。
+
+history文件夹中的各个模型历史记录文件夹名称格式：线下f1_线上f1。model文件夹中模型文件夹格式：线下f1。模型文件夹里有对应成绩的模型文件，文件中包含了
+对应的超参数说明，预训练好的模型文件（*.h5）并没有上传。
