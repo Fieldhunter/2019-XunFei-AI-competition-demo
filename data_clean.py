@@ -261,7 +261,7 @@ def change_col_index(data):
 				"adunitshowid", "mediashowid", "city", "adidmd5", \
 				"imeimd5","openudidmd5", "macmd5", "model", "osv"]
 	if data is data2:
-		del col_index[0]
+		col_index[0] = "sid"
 
 	return data[col_index]
 

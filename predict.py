@@ -4,7 +4,7 @@ from data_process import data_process
 
 # 模型以及参数位置
 MODEL_NAME = "captcha_adam_binary_crossentropy_bs_2048_epochs_450.h5"
-MODEL_PATH = 'model/90.57/'
+MODEL_PATH = 'model/90.78/'
 
 import sys
 sys.path.append(MODEL_PATH)
@@ -14,9 +14,7 @@ from pre_model import model
 # 参数以及模型对应的超参数
 OPT = 'adam'
 LOSS = 'binary_crossentropy'
-dropout_ALPHA = 0.5
-BATCH_SIZE = 256
-EPOCHS = 50
+dropout_ALPHA = 0.4
 
 
 # 加载模型和参数

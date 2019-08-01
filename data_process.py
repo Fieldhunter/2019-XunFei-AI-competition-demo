@@ -81,4 +81,3 @@ def data_process(train=True):
 		return unembedding_train, \
 			   embedding_train, \
 			   sid
-
