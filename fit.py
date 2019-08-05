@@ -10,7 +10,7 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 # 超参数
 OPT = 'adam'
 LOSS = 'binary_crossentropy'
-dropout_ALPHA = 0.4
+dropout_ALPHA = 0.5
 BATCH_SIZE = 2048
 EPOCHS = 450
 
