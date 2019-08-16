@@ -87,8 +87,8 @@ def model(LOSS, OPT, dropout_ALPHA):
 	res3 = res_block(active7, 128)
 	active8 = Activation('relu')(res3)
 
-	dropout6 = Dropout(dropout_ALPHA)(active8)
-	dense6 = Dense(1)(dropout6)
+	dropout5 = Dropout(dropout_ALPHA)(active8)
+	dense6 = Dense(1)(dropout5)
 	active9 = Activation('sigmoid')(dense6)
 
 	model = Model(inputs=[input1,input2], outputs=active9)
