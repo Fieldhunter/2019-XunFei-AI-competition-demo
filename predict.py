@@ -4,7 +4,7 @@ from data_process import data_process
 
 # 模型以及参数位置
 MODEL_NAME = "captcha_adam_binary_crossentropy_bs_2048_epochs_450.h5"
-MODEL_PATH = 'model/91.38/'
+MODEL_PATH = 'model/92.09/'
 
 import sys
 sys.path.append(MODEL_PATH)
@@ -30,16 +30,16 @@ def predict(test, pre_model):
 	predict_result = pre_model.predict(test)
 	predict_result = list(predict_result.reshape(len(predict_result),))
 
-	根据赛题要求，不是0就是1
-	result=[]
-	for i in predict_result:
-		if i < 0.5:
-			i = 0
-		else:
-			i = 1
-		result.append(i)
+	# 根据赛题要求，不是0就是1
+	# result=[]
+	# for i in predict_result:
+	# 	if i < 0.5:
+	# 		i = 0
+	# 	else:
+	# 		i = 1
+	# 	result.append(i)
 
-	return result
+	return predict_result
 
 
 # 保存为csv
