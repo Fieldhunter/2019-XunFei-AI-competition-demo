@@ -1,4 +1,4 @@
-# 2019-AI-competition-demo
+# 2019-XunFei-AI-competition-demo
 
 [![](https://img.shields.io/badge/license-MIT-green)](https://github.com/Fieldhunter/2019-XunFei-AI-competition-demo/blob/master/LICENSE)
 [![](https://img.shields.io/badge/author-Fieldhunter-blue)](https://github.com/Fieldhunter)
