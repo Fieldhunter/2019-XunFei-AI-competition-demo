@@ -1,4 +1,9 @@
 # 2019-AI-competition-demo
+
+[![](https://img.shields.io/badge/license-MIT-green)](https://github.com/Fieldhunter/2019-XunFei-AI-competition-demo/blob/master/LICENSE)
+[![](https://img.shields.io/badge/author-Fieldhunter-blue)](https://github.com/Fieldhunter)
+![](https://img.shields.io/badge/frame-keras-yellow)
+
 2019讯飞AI开发者大赛广告反欺诈赛道湖师院巴萨队demo
 
 ## 最终score
