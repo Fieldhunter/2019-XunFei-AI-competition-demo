@@ -6,6 +6,8 @@
 
 2019讯飞AI开发者大赛广告反欺诈赛道湖师院巴萨队demo
 
+团队成员：[@SinsNeverDie](https://github.com/SinsNeverDie), [@jack-lijing](https://github.com/jack-lijing)
+
 ## 最终score
 
 从最初的92.31分做到93.84898分，感觉这一类赛题不是很适合用NN去做。
